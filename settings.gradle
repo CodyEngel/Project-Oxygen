@@ -1,0 +1,2 @@
+include ':sample', ':core', ':core-test'
+rootProject.name='Project Oxygen'
