@@ -43,65 +43,54 @@ jobs:
     steps:
       - prepare-job
       - run:
+          name: Execute Core Unit Test Suite
           ./gradlew clean :core:jacocoTestReport
       - store_artifacts:
           path: core/build/reports/jacocoTestReport
           destination: coreTestReport
+      - store_test_results:
+          path: core/build/reports/jacocoTestReport
 
   unit-test-core-test:
     executor: main-executor
     steps:
       - prepare-job
       - run:
+          name: Execute Core Test Unit Test Suite
           ./gradlew clean :core-test:jacocoTestReport
       - store_artifacts:
           path: core-test/build/reports/jacocoTestReport
           destination: coreTestTestReport
+      - store_test_results:
+          path: core-test/build/reports/jacocoTestReport
 
   detekt:
     executor: main-executor
     steps:
       - prepare-job
       - run:
+          name: Execute Detekt For All Modules
           ./gradlew clean detekt
+
+  lint:
+    executor: main-executor
+    steps:
+      - prepare-job
+      - run:
+          name: Execute Lint For All Modules
+          ./gradlew clean lint
 
 workflows:
   version: 2
   verify_for_master:
     jobs:
       - detekt
+      - lint
       - unit-test-core:
           requires:
             - detekt
+            - lint
       - unit-test-core-test:
           requires:
             - detekt
-
-#jobs:
-#  checkout:
-#    working_directory: ~/code
-#  build:
-#    working_directory: ~/code
-#    docker:
-#      - image: circleci/android:api-29
-#    environment:
-#      JVM_OPTS: -Xmx3200m
-#    steps:
-#      - checkout
-#      - restore_cache:
-#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "sample/build.gradle" }}-{{ checksum  "core/build.gradle" }}-{{ checksum  "core-test/build.gradle" }}
-#      - run:
-#          name: Download Dependencies
-#          command: ./gradlew androidDependencies
-#      - save_cache:
-#          paths:
-#            - ~/.gradle
-#          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "sample/build.gradle" }}-{{ checksum  "core/build.gradle" }}-{{ checksum  "core-test/build.gradle" }}
-#      - run:
-#          name: Run Tests
-#          command: ./gradlew lint test
-#      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-#          path: app/build/reports
-#          destination: reports
-#      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-#          path: app/build/test-results
+            - lint
