@@ -76,10 +76,10 @@ workflows:
   verify_for_master:
     jobs:
       - detekt
-      - unit-test-core
+      - unit-test-core:
           requires:
             - detekt
-      - unit-test-core-test
+      - unit-test-core-test:
           requires:
             - detekt
 
