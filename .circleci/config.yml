@@ -78,7 +78,7 @@ jobs:
       - prepare-job
       - run:
           name: Execute Lint For All Modules
-          ./gradlew clean lint
+          command: ./gradlew clean lint
 
 workflows:
   version: 2
