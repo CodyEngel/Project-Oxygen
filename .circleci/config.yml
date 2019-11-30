@@ -44,7 +44,7 @@ jobs:
       - prepare-job
       - run:
           name: Execute Core Unit Test Suite
-          ./gradlew clean :core:jacocoTestReport
+          command: ./gradlew clean :core:jacocoTestReport
       - store_artifacts:
           path: core/build/reports/jacocoTestReport
           destination: coreTestReport
@@ -57,7 +57,7 @@ jobs:
       - prepare-job
       - run:
           name: Execute Core Test Unit Test Suite
-          ./gradlew clean :core-test:jacocoTestReport
+          command: ./gradlew clean :core-test:jacocoTestReport
       - store_artifacts:
           path: core-test/build/reports/jacocoTestReport
           destination: coreTestTestReport
@@ -70,7 +70,7 @@ jobs:
       - prepare-job
       - run:
           name: Execute Detekt For All Modules
-          ./gradlew clean detekt
+          command: ./gradlew clean detekt
 
   lint:
     executor: main-executor
