@@ -64,12 +64,6 @@ jobs:
       - prepare-job
       - run:
           ./gradlew clean detekt
-      - store_artifacts:
-          paths:
-            - core/build/reports/detekt
-            - core-test/build/reports/detekt
-          destination:
-            detektResults
 
 workflows:
   version: 2
