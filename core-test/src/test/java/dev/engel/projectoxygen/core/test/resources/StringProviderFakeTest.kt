@@ -35,6 +35,27 @@ class StringProviderFakeTest {
     }
 
     @Test
+    fun `given a string does not exist for resource id, when resource id is provided with arguments, then an exception should be thrown`() {
+        assertThat {
+            subject.get(resourceId, "hey", 23)
+        }.isFailure().isInstanceOf(Throwable::class.java)
+    }
+
+    @Test
+    fun `given a string does not exist for resource id, when resource id is provided with arguments, then the correct exception should be thrown`() {
+        assertThat {
+            subject.get(resourceId, "hey", 23)
+        }.isFailure().isInstanceOf(StringResValueNotFoundException::class.java)
+    }
+
+    @Test
+    fun `given a string does not exist for resource id, when resource id is provided with arguments, then the correct cause should be provided`() {
+        assertThat {
+            subject.get(resourceId, "hey", 23)
+        }.isFailure().hasMessage(FORMATTED_MESSAGE.format(resourceId))
+    }
+
+    @Test
     fun `given a string exists for a resource id, when resource id is provided, then the string should be returned`() {
         subject.expect(stringResValue)
 

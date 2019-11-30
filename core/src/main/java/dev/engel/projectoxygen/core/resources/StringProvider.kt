@@ -26,7 +26,7 @@ interface StringProvider {
     fun get(@StringRes resourceId: Int, vararg formatArguments: Any): String
 
     /**
-     * This is a convenience
+     * This is a convenience function which proxies to the vararg version of this function.
      *
      * @param resourceId - the corresponding resource id for the expected string.
      * @param formatArguments - the arguments which should be used to format the string.
@@ -52,10 +52,12 @@ interface StringProvider {
                 }
 
                 override fun get(resourceId: Int, vararg formatArguments: Any): String {
+                    @Suppress("SpreadOperator")
                     return applicationContext.getString(resourceId, *formatArguments)
                 }
 
                 override fun get(resourceId: Int, formatArguments: List<Any>): String {
+                    @Suppress("SpreadOperator")
                     return get(resourceId, *formatArguments.toTypedArray())
                 }
 
