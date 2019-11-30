@@ -45,3 +45,5 @@ this project.
 * [detekt](https://github.com/arturbosch/detekt) is used for static 
 analysis with Kotlin. You can run this locally by running 
 `./gradlew detekt`.
+* [jacoco](https://www.jacoco.org/jacoco/) is used for code coverage
+reporting. You can run this locally by running `./gradlew :<MODULE>:jacocoTestReport`.
