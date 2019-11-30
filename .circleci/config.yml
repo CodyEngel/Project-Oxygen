@@ -49,7 +49,7 @@ jobs:
           path: core/build/reports/jacocoTestReport
           destination: coreTestReport
       - store_test_results:
-          path: core/build/reports/jacocoTestReport
+          path: core/build/test-results
 
   unit-test-core-test:
     executor: main-executor
@@ -62,7 +62,7 @@ jobs:
           path: core-test/build/reports/jacocoTestReport
           destination: coreTestTestReport
       - store_test_results:
-          path: core-test/build/reports/jacocoTestReport
+          path: core-test/build/test-results
 
   detekt:
     executor: main-executor
