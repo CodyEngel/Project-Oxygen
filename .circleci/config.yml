@@ -45,7 +45,7 @@ jobs:
       - run:
           ./gradlew clean :core:jacocoTestReport
       - store_artifacts:
-          path: core/reports/jacocoTestReport
+          path: core/build/reports/jacocoTestReport
           destination: coreTestReport
 
   unit-test-core-test:
@@ -55,15 +55,33 @@ jobs:
       - run:
           ./gradlew clean :core-test:jacocoTestReport
       - store_artifacts:
-          path: core-test/reports/jacocoTestReport
+          path: core-test/build/reports/jacocoTestReport
           destination: coreTestTestReport
+
+  detekt:
+    executor: main-executor
+    steps:
+      - prepare-job
+      - run:
+          ./gradlew clean detekt
+      - store_artifacts:
+          paths:
+            - core/build/reports/detekt
+            - core-test/build/reports/detekt
+          destination:
+            detektResults
 
 workflows:
   version: 2
-  test:
+  verify_for_master:
     jobs:
+      - detekt
       - unit-test-core
+          requires:
+            - detekt
       - unit-test-core-test
+          requires:
+            - detekt
 
 #jobs:
 #  checkout:
