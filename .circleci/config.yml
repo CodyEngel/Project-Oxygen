@@ -1,31 +1,96 @@
-version: 2
-jobs:
-  build:
+version: 2.1
+
+executors:
+  main-executor:
     working_directory: ~/code
     docker:
       - image: circleci/android:api-29
     environment:
       JVM_OPTS: -Xmx3200m
+
+references:
+  workspace_root: &workspace_root
+                    /tmp/workspace
+  attach_workspace: &attach_workspace
+    attach_workspace:
+      at: *workspace_root
+
+commands:
+  android-deps:
+    description: "Runs specialized Android cache step."
     steps:
-      - checkout
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
-      #      - run:
-      #         name: Chmod permissions #if permission for Gradlew Dependencies fail, use this.
-      #         command: sudo chmod +x ./gradlew
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "sample/build.gradle" }}-{{ checksum  "core/build.gradle" }}-{{ checksum  "core-test/build.gradle" }}
       - run:
-          name: Download Dependencies
+          name: "Download Android Dependencies"
           command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "app/build.gradle" }}
+          key: jars-{{ checksum "build.gradle" }}-{{ checksum  "sample/build.gradle" }}-{{ checksum  "core/build.gradle" }}-{{ checksum  "core-test/build.gradle" }}
+
+  prepare-job:
+    description: "Pre-requisites that are required for all jobs."
+    steps:
+      - *attach_workspace
+      - checkout
+      - android-deps
+
+
+jobs:
+  unit-test-core:
+    executor: main-executor
+    steps:
+      - prepare-job
       - run:
-          name: Run Tests
-          command: ./gradlew lint test
-      - store_artifacts: # for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: app/build/reports
-          destination: reports
-      - store_test_results: # for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
-          path: app/build/test-results
-      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+          name: Execute Core Unit Test Suite
+          command: ./gradlew clean :core:jacocoTestReport
+      - store_artifacts:
+          path: core/build/reports/jacocoTestReport
+          destination: coreTestReport
+      - store_test_results:
+          path: core/build/test-results
+
+  unit-test-core-test:
+    executor: main-executor
+    steps:
+      - prepare-job
+      - run:
+          name: Execute Core Test Unit Test Suite
+          command: ./gradlew clean :core-test:jacocoTestReport
+      - store_artifacts:
+          path: core-test/build/reports/jacocoTestReport
+          destination: coreTestTestReport
+      - store_test_results:
+          path: core-test/build/test-results
+
+  detekt:
+    executor: main-executor
+    steps:
+      - prepare-job
+      - run:
+          name: Execute Detekt For All Modules
+          command: ./gradlew clean detekt
+
+  lint:
+    executor: main-executor
+    steps:
+      - prepare-job
+      - run:
+          name: Execute Lint For All Modules
+          command: ./gradlew clean lint
+
+workflows:
+  version: 2
+  verify_for_master:
+    jobs:
+      - detekt
+      - lint
+      - unit-test-core:
+          requires:
+            - detekt
+            - lint
+      - unit-test-core-test:
+          requires:
+            - detekt
+            - lint
