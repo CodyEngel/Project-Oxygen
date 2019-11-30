@@ -42,5 +42,6 @@ TBD - this will be responsible for improving upon LiveData for Android.
 This is a breakdown of the different technologies that are used within
 this project.
 
-* `detekt` is used for static analysis with Kotlin. You can run this
-locally by running `./gradlew detekt`.
+* [detekt](https://github.com/arturbosch/detekt) is used for static 
+analysis with Kotlin. You can run this locally by running 
+`./gradlew detekt`.
